@@ -6,12 +6,13 @@ distributor(Delay, Resources) when is_list(Resources), is_integer(Delay) ->
         {Pid, request_distributor, Resource, Amount} when is_integer(Amount), Amount > 0 ->
             case lists:member(Resource, Resources) of 
                 true ->
+                    user_interface ! {update, distributor, {self(), Resource}},
                     timer:sleep(Delay),
-                    io:format("(~p) distributor sending ~s~n", [self(), Resource]),
                     Pid ! {distributor_delivery, Resource, Amount};
-                false ->
-                    io:format("(~p) invalid request~n", [self()]) 
+                _ ->
+                    ignore
             end
     end,
+    user_interface ! {update, distributor, {self(), none}},
     distributor(Delay, Resources).
 

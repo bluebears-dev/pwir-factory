@@ -4,6 +4,7 @@
 -import(distributor, [distributor/2]).
 -import(storage, [create_storage/5]).
 -import(prod_line, [machine/7]).
+-import(ui, [create_ui/3]).
 
 send_bottle(Pid) -> 
     Pid ! {produce, [bottle]},
@@ -13,17 +14,22 @@ send_bottle(Pid) ->
 collect() ->
     receive
         {produce, Product} ->
-            io:format("~p finalized~n", [Product])
+            ok
     end,
     collect().
 
 main() ->
     LabelDistPid = spawn(distributor, distributor, [3000, [label]]),
-    LabelStoragePid = spawn(storage, create_storage, [LabelDistPid, [label], [50], 20, 500]),
+    LabelStoragePid = spawn(storage, create_storage, [LabelDistPid, [label], [20], 20, 500]),
     LabelMachinePid = spawn(prod_line, machine, [LabelStoragePid, spawn(main, collect, []), gaz, label, 0, 500, 10]), 
 
     WaterDistPid = spawn(distributor, distributor, [2000, [gaz, ngaz]]),
     WaterStoragePid = spawn(storage, create_storage, [WaterDistPid, [gaz, ngaz], [1000, 1000], 100, 1000]),
     WaterMachinePid = spawn(prod_line, machine, [WaterStoragePid, LabelMachinePid, bottle, gaz, 0, 100, 100]),
+    UiPid = spawn(ui, create_ui, [[{LabelDistPid, "Label"}, {WaterDistPid, "Water"}], [{LabelStoragePid, "Label"}, {WaterStoragePid, "Water"}], []]),
+
+    register(user_interface, UiPid),
 
     send_bottle(WaterMachinePid).
+
+

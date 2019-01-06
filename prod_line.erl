@@ -12,7 +12,7 @@ machine(StoragePid, NextMachinePid, Component, Resource, CurrentAmount, Delay, R
                     timer:sleep(Delay),
                     NextMachinePid ! {produce, Product++[Resource]},
                     machine(StoragePid, NextMachinePid, Component, Resource, CurrentAmount - 1, Delay, RefillAmount);
-                false ->
+                _ ->
                     machine(StoragePid, NextMachinePid, Component, Resource, CurrentAmount, Delay, RefillAmount)
 
             end
@@ -20,7 +20,6 @@ machine(StoragePid, NextMachinePid, Component, Resource, CurrentAmount, Delay, R
 
 empty_machine(StoragePid, NextMachinePid, Component, Resource, Delay, RefillAmount) -> 
     StoragePid ! {self(), request_storage, Resource, RefillAmount},
-    io:format("(~p) machine is empty ~s~n", [self(), Resource]),
     receive
         {storage_delivery, Resource, Amount} when is_integer(Amount) ->
             machine(StoragePid, NextMachinePid, Component, Resource, Amount, Delay, RefillAmount);
