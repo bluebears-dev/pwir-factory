@@ -1,0 +1,1 @@
+erl -noinput -pa ./cecho/_build/default/lib/cecho/ebin +A 50 -eval "factory:main()."
