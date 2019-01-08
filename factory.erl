@@ -21,8 +21,7 @@
 
 
 main() ->
-    process_flag(trap_exit, true),
-    UiPid = spawn_link(ui, create_ui, []),
+    UiPid = spawn(ui, create_ui, []),
     register(user_interface, UiPid),
 
     Bottles = [pol_litrowa, poltora_litrowa],
@@ -73,11 +72,5 @@ main() ->
                         {[pol_litrowa, niegazowana, nakretka, etykieta_niegazowanej], "Linia wody niegazowanej"},
                         {[poltora_litrowa, gazowana, nakretka, etykieta_gazowanej], "Linia wody gazowanej duzej"}
                       ],
-    user_interface ! {Distributors, Storages, ProductionLines},
-    receive
-        {'EXIT', _, _} ->
-            cecho:nocbreak(),
-            application:stop(cecho),
-            erlang:halt()
-    end.
+    user_interface ! {Distributors, Storages, ProductionLines}.
 

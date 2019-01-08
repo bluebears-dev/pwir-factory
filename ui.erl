@@ -108,7 +108,6 @@ draw_products([Member|ProdLines], Group, Amount, PosX, PosY) ->
 
 
 ui(Distributors, Storages, ProductionLines) ->
-    Pid = self(),
     receive
         {update, distributor, {Pid, Resource}} ->
             draw_distributors(Distributors, Pid, Resource, 3, 4);
