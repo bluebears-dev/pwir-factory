@@ -136,6 +136,20 @@ draw_complex_label(ComplexLabels, MainLabel, PosX, PosY, DeltaX) ->
     cecho:mvaddstr(PosX, PosY, MainLabel),
     draw_element_label(ComplexLabels, PosX + 1, PosY + 2, DeltaX).
 
+ui_input() ->
+    cecho:refresh(),
+    Key = cecho:getch(),
+    case Key of
+        $q ->
+            cecho:echo(),
+            cecho:nocbreak(),
+            application:stop(cecho),
+            erlang:halt();
+        _ ->
+            ui_input()
+    end.
+
+
 create_ui() ->
     {Distributors, Storages, ProductionLines} = receive
        V -> V
@@ -144,8 +158,9 @@ create_ui() ->
     draw_dist_label(Distributors, 2, 2),
     draw_complex_label(Storages, "Magazyny", 5, 2, 2),
     draw_complex_label(ProductionLines, "Linie produkcyjne", 18, 2, 3),
-    
-    cecho:mvaddstr(0,0, " "),
+    {My, Mx} = cecho:getmaxyx(),
+    cecho:mvaddstr(My - 1, 0, string:pad(io_lib:format("~ts", ["q - Zakoncz program"]), Mx, both)),
     cecho:refresh(),
+    spawn(ui, ui_input, []),
     ui(Distributors, Storages, ProductionLines).
 
