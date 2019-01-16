@@ -22,6 +22,9 @@
 main_loop() ->
     main_loop().
 
+main([]) ->
+    io:format("~ts~n~ts~n~ts~n~ts~n", ["Wybierz jeden z wariantow fabryki:", "1 - Wariant 1", "2 - Wariant 2", "3 - Wariant 3"]);
+
 main([Factory|_]) ->
     UiPid = spawn(ui, create_ui, []),
     register(user_interface, UiPid),
